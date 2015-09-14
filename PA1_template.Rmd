@@ -11,19 +11,17 @@ When you click the **Knit** button a document will be generated that includes bo
 
 import libraries and change echo option
 ```{r}
-#summary(cars)
 library(plyr)
 library(ggplot2)
-echo = TRUE
 ```
 
 ###read the data
-```{r}
+```{r, echo=TRUE}
 data <- read.csv("activity.csv")
 data$date <- as.POSIXct(data$date)
 ```
 ###aggregation steps, making first plot and computting the mean and median
-```{r}
+```{r, echo=TRUE}
 sum_steps <- aggregate(data$steps, by=list(data$date), sum, na.rm = TRUE)
 names(sum_steps) <- list("Day", "Steps_amount")
 
@@ -31,10 +29,11 @@ names(sum_steps) <- list("Day", "Steps_amount")
 qplot(sum_steps$Steps_amount, geom ="histogram", xlab="Daily number of steps", ylab="Quantity")
 mean_steps <- mean(sum_steps$Steps_amount)
 median_steps <- median(sum_steps$Steps_amount)
+print(mean_steps)
+print(median_steps)
 ```
-
 ###Average daily activity pattern
-```{r}
+```{r, echo=TRUE}
 int_steps <- aggregate(data$steps, by= list(data$interval), mean, na.rm=TRUE)
 int_steps_med <- aggregate(data$steps, by= list(data$interval), median, na.rm=TRUE)
 int_steps_all <- cbind(int_steps[], int_steps_med$x)
@@ -43,9 +42,10 @@ int_steps_all$mean_steps <- round(int_steps_all$mean_steps)
 int_steps_all$median_steps <- round(int_steps_all$median_steps)
 ggplot(int_steps_all, aes(x = interval, y = mean_steps)) + geom_line()
 max_steps <- int_steps_all$interval[int_steps_all$mean_steps == max(int_steps_all$mean_steps)]
+print(max_steps)
 ```
 ### NA's impute mean
-```{r}
+```{r, echo=TRUE}
 #find NA
 na_steps <- subset(data, is.na(steps))
 number_of_NA <- length(na_steps$steps)
@@ -61,7 +61,7 @@ data <- rbind(data, n_steps)
 ```
 
 ###sum the number of steps eac day and get the mean and median, plot new hist
-```{r}
+```{r, echo=TRUE}
 #new sum without NA
 int_steps_med2 <- aggregate(data$steps, by = list(data$date), sum, na.rm = TRUE)
 names(int_steps_med2) <- c("Date", "steps")
@@ -70,25 +70,23 @@ qplot(int_steps_med2$steps, geom ="histogram", xlab="Daily number of steps, medi
 #mean median
 mean_steps2 <- mean(int_steps_med2$steps)
 median_steps2 <- mean(int_steps_med2$steps)
+print(mean_steps2)
+print(median_steps2)
 ```
 
 ### create new var weekday/end, preprocess for plotting
-```{r}
+```{r, echo=TRUE}
 data$week_d_e <- ifelse(weekdays(data$date)=="Saturday" | weekdays(data$date)=="Sunday", "weekend", "weekday") 
-
-
 int_steps_mean3 <- aggregate(data$steps, by = list(data$week_d_e, data$interval), mean, na.rm = TRUE)
 int_steps_median3 <- aggregate(data$steps, by = list(data$week_d_e, data$interval), median, na.rm = TRUE)
-
 int_steps3 <- cbind(int_steps_mean3[], int_steps_median3$x)
-
 names(int_steps3) <- c("weekday", "interval", "mean_steps", "median_steps")
 int_steps3$mean_steps <- round(int_steps3$mean_steps)
 int_steps3$median_steps <- round(int_steps3$median_steps)
 ```
 
 ### Plot graphs weekday/end
-```{r}
+```{r, echo=TRUE}
 #plot two lines to compare
 par(mfrow=c(1,1))
 with(int_steps3, plot(mean_steps ~ interval, type="n", main="Weekday and Weekend"))
